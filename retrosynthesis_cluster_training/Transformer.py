@@ -3,7 +3,10 @@ from modules import *
 
 # Module to convert tensor of input indices into corresponding tensor of token embeddings
 class TokenEmbedding(nn.Module):
-    def __init__(self, vocab_size: int, emb_size: int):
+    def __init__(self,
+                 vocab_size: int,
+                 emb_size: int):
+        
         super(TokenEmbedding, self).__init__()
         self.embedding = nn.Embedding(vocab_size, emb_size)
         self.emb_size = emb_size
@@ -17,6 +20,7 @@ class PositionalEncoding(nn.Module):
                  emb_size: int,
                  dropout: float,
                  maxlen: int = MAX_SEQ_LEN):
+        
         super(PositionalEncoding, self).__init__()
         den = torch.exp(- torch.arange(0, emb_size, 2)* math.log(10000) / emb_size)
         pos = torch.arange(0, maxlen).reshape(maxlen, 1)
@@ -81,8 +85,7 @@ class Seq2SeqTransformer(nn.Module):
         self.src_tok_emb = TokenEmbedding(src_vocab_size, emb_size)
         self.tgt_tok_emb = TokenEmbedding(tgt_vocab_size, emb_size)
         self.DEVICE = DEVICE
-        self.positional_encoding = PositionalEncoding(
-            emb_size, dropout=dropout)
+        self.positional_encoding = PositionalEncoding(emb_size, dropout=dropout)
 
     def forward(self,
                 src: Tensor,
@@ -95,17 +98,50 @@ class Seq2SeqTransformer(nn.Module):
         
         src_emb = self.positional_encoding(self.src_tok_emb(src))
         tgt_emb = self.positional_encoding(self.tgt_tok_emb(trg))
-        outs = self.transformer(src_emb, tgt_emb, src_mask, tgt_mask, None,
-                                src_padding_mask, tgt_padding_mask, memory_key_padding_mask)
+        
+        outs = self.transformer(src=src_emb,
+                                tgt=tgt_emb,
+                                src_mask=src_mask,
+                                tgt_mask=tgt_mask,
+                                memory_mask=None,
+                                src_key_padding_mask=src_padding_mask,
+                                tgt_key_padding_mask=tgt_padding_mask,
+                                memory_key_padding_mask=memory_key_padding_mask)
+        
+        
         return self.generator(outs)
     
     # encoder for inference
-    def encode(self, src: Tensor, src_mask: Tensor):
+    def encode(self,
+               src: Tensor,
+               src_mask: Tensor,
+               src_key_padding_mask: Tensor):
+        
+        return self.transformer.encoder(self.positional_encoding(self.src_tok_emb(src)),
+                                        src_mask,
+                                        src_key_padding_mask=src_key_padding_mask)
+    
+    # Decoder for inference
+    def decode(self,
+               tgt: Tensor,
+               memory: Tensor,
+               tgt_mask: Tensor,
+               memory_key_padding_mask: Tensor,
+               tgt_key_padding_mask: Tensor):
+        
+        return self.transformer.decoder(self.positional_encoding(self.tgt_tok_emb(tgt)),
+                                        memory,
+                                        tgt_mask,
+                                        memory_key_padding_mask=memory_key_padding_mask,
+                                        tgt_key_padding_mask=tgt_key_padding_mask)
+    
+    # encoder for inference
+    def encode_old(self, src: Tensor, src_mask: Tensor):
         return self.transformer.encoder(self.positional_encoding(
                             self.src_tok_emb(src)), src_mask)
     
     # Decoder for inference
-    def decode(self, tgt: Tensor, memory: Tensor, tgt_mask: Tensor):
+    def decode_old(self, tgt: Tensor, memory: Tensor, tgt_mask: Tensor):
         return self.transformer.decoder(self.positional_encoding(self.tgt_tok_emb(tgt)), memory,
                           tgt_mask)
 

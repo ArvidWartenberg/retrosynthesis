@@ -5,11 +5,18 @@ from constants import *
 # ReactionDataset class
 class ReactionDataset(Dataset):
 
-    def __init__(self, data, split, maxlen=MAX_SEQ_LEN, rep=" ^$#%()+-./0123456789=@ABCDEFGHIKLMNOPRSTVXYZ[\\]abcdefgilmnoprstuy"):
+    def __init__(self, 
+                 data, 
+                 split,
+                 args,
+                 maxlen=MAX_SEQ_LEN,
+                 rep=" ^$#%()+-./0123456789=@ABCDEFGHIKLMNOPRSTVXYZ[\\]abcdefgilmnoprstuy"):
+        
         self.split = split
         self.data = data[self.split]
         self.maxlen = maxlen
         self.rep = rep
+        self.args = args
         self.char_to_ix = { ch:i for i,ch in enumerate(rep) }
         self.ix_to_char = { i:ch for i,ch in enumerate(rep) }
         # Add augmentation methods here later
@@ -31,10 +38,10 @@ class ReactionDataset(Dataset):
         
         # Augment smiles here for train
         
-        rs = torch.tensor([self.char_to_ix[char] for char in rs_smiles])
-        ps = torch.tensor([self.char_to_ix[char] for char in ps_smiles])
+        rs = np.array([self.char_to_ix[char] for char in rs_smiles])
+        ps = np.array([self.char_to_ix[char] for char in ps_smiles])
         
         return {
-            "rs": rs.to(dtype=torch.int64),
-            "ps": ps.to(dtype=torch.int64)
+            "rs": rs,
+            "ps": ps
         }
