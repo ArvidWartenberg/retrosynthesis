@@ -61,16 +61,20 @@ class Trainer:
                                     memory_key_padding_mask=src_padding_mask)
 
                 # compute loss and backprop
-                loss = self.loss_fn(logits.reshape(-1, logits.shape[-1]), tgt_out.reshape(-1))
+                flat_targets = tgt_out.reshape(-1)
+                loss = self.loss_fn(logits.reshape(-1, logits.shape[-1]), flat_targets)
 
                 if split=="train": 
                     loss.backward()
                     self.optimizer.step()
-                  
+                
+                predicted_chars = torch.argmax(logits.reshape(-1, logits.shape[-1]),axis=1)
+                accuracy = torch.sum(predicted_chars == flat_targets)/flat_targets.shape[0]
+                                         
                 losses += loss.item()
                 
                 
-        return losses / len(self.dataloaders[split])
+        return losses/len(self.dataloaders[split]), accuracy
 
     # This method manages training by iterating over epochs, saving some data to a tensorboard along the way
     def training_monitoring(self):
@@ -116,22 +120,25 @@ class Trainer:
                 t1 = time()
                 print("..." + split, end="")
                 
-                epoch_loss = self.run_one_split(split=split)
+                epoch_loss, accuracy = self.run_one_split(split=split)
+                print("...finished in %.2f s! "%(time()-t1), end="")
+                
                 losses[split] = epoch_loss
                 running_losses[split].append(epoch_loss)
+                                
+                writer.add_scalar('Training/'+split+"_loss", epoch_loss, epoch+1)
+                writer.add_scalar("Metrics/"+split+"_char_accuracy", accuracy, epoch+1)
                 
-                writer.add_scalar('Loss/'+split, epoch_loss, epoch+1)
-                
-                print("...finished in %.2f s! "%(time()-t1), end="")
                 if (split == 'eval' and epoch_loss < best_loss) or (self.args["debug"] is not None and epoch_loss < best_loss):
                     print("Best epoch...saving weights... ", end="")
                     best_loss = epoch_loss
                     best_model_wts = self.model.state_dict()
                     torch.save(self.model.state_dict(), total_dir_path + model_str + "/weights")
                 
-                torch.save(self.model.state_dict(), total_dir_path + model_str + "/weights_last_epoch")
+                if epoch%50==0 and split == "eval":
+                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/weights_epoch_%i"%epoch)
             
             self.scheduler.step()
-            writer.add_scalar('lr/', self.scheduler.get_lr()[0], epoch+1)
+            writer.add_scalar('Training/'+"LR", self.scheduler.get_lr()[0], epoch+1)
             print()
             print("Epoch %i losses are; Train: %.4f // Eval: %.4f."%(epoch,losses["train"],losses["eval"]))

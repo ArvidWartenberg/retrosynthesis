@@ -30,6 +30,7 @@ def parseArguments(default_args):
 def main():
     
     args = parseArguments(default_args=default_args)
+    args["SEED"] = torch.seed()
     #torch.manual_seed(1337)
     
     print("RUN PARAMS: ")
