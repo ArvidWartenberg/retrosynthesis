@@ -1,1 +1,2 @@
-
+TEST RESULTS SAVED AT                        POINTS         ACCURACIES
+/home/arvid/models/chemformers/x.pickle 
