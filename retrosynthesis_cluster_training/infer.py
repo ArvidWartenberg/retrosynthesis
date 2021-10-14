@@ -50,7 +50,7 @@ def main():
     gc.collect()
     
     # Load specified dataset
-    if settings["dataset"] == "non-augmented": file = open("/home/arvid/data/USTPO_not_augmented/data.pickle","rb")
+    if settings["dataset"] == "non-augmented": file = open(home_dir + "/data/USTPO_not_augmented/data.pickle","rb")
     else: file = open(home_dir + "/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
     data = pickle.load(file)
     
