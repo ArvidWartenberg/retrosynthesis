@@ -84,7 +84,7 @@ class Trainer:
 
     # This method manages training by iterating over epochs, saving some data to a tensorboard along the way
     def training_monitoring(self):
-
+        
         folder_dir = os.path.expanduser("~/models/chemformers/") 
         day_dir = datetime.now().strftime("%Y-%m-%d")
         if day_dir not in os.listdir(folder_dir):

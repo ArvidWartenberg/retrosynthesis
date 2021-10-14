@@ -28,10 +28,14 @@ def parseArguments(default_args):
         return args
 
 def main():
+    os.chdir("..")
+    home_dir = os.getcwd()
+    os.chdir("retrosynthesis_cluster_training/")
     
     args = parseArguments(default_args=default_args)
     args["SEED"] = torch.seed()
     #torch.manual_seed(1337)
+    args["home_dir"] = home_dir
     
     print("RUN PARAMS: ")
     for a in args:
@@ -46,7 +50,7 @@ def main():
     torch.cuda.empty_cache()
     gc.collect()
     
-    file = open("/home/arvid/data/USTPO_not_augmented/data.pickle","rb")
+    file = open(args["home_dir"] + "/data/USTPO_not_augmented/data.pickle","rb")
     #open("/home/arvid/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
     
     data = pickle.load(file)
@@ -81,9 +85,10 @@ def main():
         if p.dim() > 1:
             nn.init.xavier_uniform_(p)
         
-        
+    
+    # TODO OUTDATED
     if args["checkpoint"] is not None:
-        models_dir = "/home/arvid/models/transformers/"
+        models_dir = args["home_dir"] + "/models/transformers/"
         chemFormer.load_state_dict(torch.load(models_dir + args["checkpoint"] + "/weights"))
         print("Successfully loaded checkpoint: " + models_dir + args["checkpoint"] + "/weights")   
  

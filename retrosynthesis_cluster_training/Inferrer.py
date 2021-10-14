@@ -289,7 +289,7 @@ class Inferrer:
         else: result_string += "Greedy: %.1f  "%(accuracies[0]*100)
             
         
-        with open('/home/arvid/RESULTS.txt', "a") as fhandle:
+        with open(self.args["home_dir"] + '/RESULTS.txt', "a") as fhandle:
             fhandle.write(f'{result_string}\n')
         print("Saved inferred results, predictions & targets to " + test_results_name)
         print("Wrote to RESULTS.txt in home dir.")

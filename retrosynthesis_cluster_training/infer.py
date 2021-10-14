@@ -29,13 +29,17 @@ def parseArguments():
 
 def main():
     
+    os.chdir("..")
+    home_dir = os.getcwd()
+    os.chdir("retrosynthesis_cluster_training/")
+    
     # Parse specified inference settings
     settings = parseArguments()
-    model_dir = "/home/arvid/models/chemformers/" + settings["model"] + "/"
+    model_dir = home_dir + "/models/chemformers/" + settings["model"] + "/"
     
     # Load original experiment args
     args = pickle.load(open(model_dir + "params.pickle", "rb"))
-        
+    args["home_dir"] = home_dir
 
     DEVICE = torch.device(settings["device"] if torch.cuda.is_available() else 'cpu')
     torch.torch.cuda.set_device(DEVICE)
@@ -47,7 +51,7 @@ def main():
     
     # Load specified dataset
     if settings["dataset"] == "non-augmented": file = open("/home/arvid/data/USTPO_not_augmented/data.pickle","rb")
-    else: file = open("/home/arvid/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
+    else: file = open(home_dir + "/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
     data = pickle.load(file)
     
     datasets = {}
