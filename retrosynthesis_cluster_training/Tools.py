@@ -8,6 +8,18 @@ from torch.optim.lr_scheduler import _LRScheduler
 def tokens_to_smiles(tokens):
     return "".join([ix_to_char[e] for e in tokens]).split(".")
 
+def smiles_matching(tgt_smiles, out_smiles):
+    out_mols = [Chem.MolFromSmiles(e) for e in out_smiles]
+    tgt_mols = [Chem.MolFromSmiles(e) for e in tgt_smiles]
+    if None in out_mols:
+        return False
+    else:
+        out_smiles_canonical = [Chem.MolToSmiles(e) for e in out_mols]
+        tgt_smiles_canonical = [Chem.MolToSmiles(e) for e in tgt_mols]
+
+        if set(out_smiles_canonical) == set(tgt_smiles_canonical): return True
+        else: return False
+
 class CosineAnnealingWarmupRestarts(_LRScheduler):
     """
         optimizer (Optimizer): Wrapped optimizer.

@@ -33,6 +33,7 @@ class Trainer:
 
         # Iterate over batches in split
         losses = 0
+        accuracy = 0
         with torch.set_grad_enabled(split == "train"):
             for batch in self.dataloaders[split]:
                 #torch.tensor().to(dtype=torch.int64)
@@ -68,13 +69,18 @@ class Trainer:
                     loss.backward()
                     self.optimizer.step()
                 
+
+                non_pad_ixs = torch.where(flat_targets != PAD_IDX)
                 predicted_chars = torch.argmax(logits.reshape(-1, logits.shape[-1]),axis=1)
-                accuracy = torch.sum(predicted_chars == flat_targets)/flat_targets.shape[0]
-                                         
+                
+                flat_targets = flat_targets[non_pad_ixs]
+                predicted_chars = predicted_chars[non_pad_ixs]
+                accuracy += torch.sum(predicted_chars == flat_targets)/flat_targets.shape[0]
+                
                 losses += loss.item()
                 
                 
-        return losses/len(self.dataloaders[split]), accuracy
+        return losses/len(self.dataloaders[split]), accuracy/len(self.dataloaders[split])
 
     # This method manages training by iterating over epochs, saving some data to a tensorboard along the way
     def training_monitoring(self):
@@ -105,6 +111,7 @@ class Trainer:
 
 
         best_loss = 999999999
+        best_acc = 0
         running_losses = {'train': [], 'eval': []}    
 
         # Loop
@@ -130,13 +137,18 @@ class Trainer:
                 writer.add_scalar("Metrics/"+split+"_char_accuracy", accuracy, epoch+1)
                 
                 if (split == 'eval' and epoch_loss < best_loss) or (self.args["debug"] is not None and epoch_loss < best_loss):
-                    print("Best epoch...saving weights... ", end="")
                     best_loss = epoch_loss
                     best_model_wts = self.model.state_dict()
-                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/weights")
+                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/best_loss")
                 
                 if epoch%50==0 and split == "eval":
-                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/weights_epoch_%i"%epoch)
+                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/epoch_%i"%epoch)
+                    
+                if accuracy > best_acc and split == "eval":
+                    best_acc = accuracy
+                    torch.save(self.model.state_dict(), total_dir_path + model_str + "/best_acc")
+                    
+                if split == "train": torch.save(self.model.state_dict(), total_dir_path + model_str + "/latest")
             
             self.scheduler.step()
             writer.add_scalar('Training/'+"LR", self.scheduler.get_lr()[0], epoch+1)

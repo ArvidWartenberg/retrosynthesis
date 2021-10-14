@@ -46,7 +46,9 @@ def main():
     torch.cuda.empty_cache()
     gc.collect()
     
-    file = open("/home/arvid/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
+    file = open("/home/arvid/data/USTPO_not_augmented/data.pickle","rb")
+    #open("/home/arvid/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
+    
     data = pickle.load(file)
     if args["debug"] is not None: 
         data = {"train": data["train"][0:64], "eval": data["eval"][0:64]}

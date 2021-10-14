@@ -11,6 +11,11 @@ import argparse
 import pdb
 from rdkit import Chem
 from datetime import datetime
+from heapq import heappush, heappop
+from rdkit import RDLogger 
+RDLogger.DisableLog('rdApp.*')
+from itertools import count
+
 
 # Deep learning modules
 import torch
@@ -18,6 +23,7 @@ from torch.utils.data import Dataset
 import torch.nn.functional as F
 import torch.nn as nn
 from torch import Tensor
+#from CustomTransformer import *
 from torch.nn import Transformer
 from torch.utils.data import Dataset
 import torch.nn.functional as F
