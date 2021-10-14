@@ -2,9 +2,9 @@
 
 The following instructions guide you in reproducing results from [1,2] using the powerful Transformers architecture [3].
 
-[1] https://link.springer.com/chapter/10.1007/978-3-030-30493-5_78\
-[2] https://www.nature.com/articles/s41467-020-19266-y\
-[3] https://arxiv.org/abs/1706.03762\
+[1] https://link.springer.com/chapter/10.1007/978-3-030-30493-5_78 \
+[2] https://www.nature.com/articles/s41467-020-19266-y \
+[3] https://arxiv.org/abs/1706.03762 \
 
 ## Requirements
 TODO
