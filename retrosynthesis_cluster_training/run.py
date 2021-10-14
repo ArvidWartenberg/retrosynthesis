@@ -26,7 +26,8 @@ def parseArguments(default_args):
         args["device"] = "cuda:" + args["device"]
 
         return args
-
+        
+         
 def main():
     os.chdir("..")
     home_dir = os.getcwd()
@@ -123,6 +124,6 @@ def main():
                       args=args)
     trainer.training_monitoring()
         
-
+# Example: python3 run.py --device 0 --name my_run
 if __name__ == '__main__':
     main()
