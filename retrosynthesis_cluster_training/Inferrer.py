@@ -258,8 +258,9 @@ class Inferrer:
             correct_at_top_k = np.zeros(top_k)
             correct_at_top_k = np.zeros(top_k)
             for i in range(top_k):
-                prediction = predictions[i]
-                if smiles_matching(out_smiles = prediction["output"], tgt_smiles = tgt_out): correcly_predicted = True
+                if len(predictions) >= k:
+                    prediction = predictions[i]
+                    if smiles_matching(out_smiles = prediction["output"], tgt_smiles = tgt_out): correcly_predicted = True
                 correct_at_top_k[i] = int(correcly_predicted)
 
             top_k_tots += np.ones(top_k)
