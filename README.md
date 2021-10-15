@@ -43,7 +43,7 @@ parser.add_argument("--beam_size", help="beam size", default=5, required=False)
 ````
 Example: Run inference on entire test/val (using same xD) using greedy decoding. Model with best token ACC during training is used
 ```bash
-python3 infer.py --model yyyy/mm/dd/my_name --weights best_acc --n_infer all --device=0 --algorithm greedy
+python3 infer.py --model yyyy-mm-dd/my_run --weights best_acc --n_infer all --device=0 --algorithm greedy
 ```
 Inferred reactants will be written to a pickle file (script prints exact path).\
 Also, each inference run writes to the RESULTS.txt file in root with a short summary of accuracies & which model was used.
