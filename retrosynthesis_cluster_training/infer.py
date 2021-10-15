@@ -18,8 +18,8 @@ def parseArguments():
         parser.add_argument("--weights", help="Choose checkpoint", default="best_acc", required=False)
         parser.add_argument("--dataset", help="choose dataset", default="non-augmented", required=False)
         parser.add_argument("--n_infer", help="num inference points", default="all", required=False)
-        parser.add_argument("--k", help="top k to be reported", default=5, required=False)
-        parser.add_argument("--beam_size", help="beam size", default=5, required=False)
+        parser.add_argument("--k", help="top k to be reported", default=5, type=int, required=False)
+        parser.add_argument("--beam_size", help="beam size", default=5, type=int, required=False)
         # TODO add dataset argument
         
         args = parser.parse_args().__dict__
