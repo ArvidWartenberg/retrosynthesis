@@ -7,7 +7,7 @@ The following instructions guide you in reproducing results from [1,2] using the
 [3] https://arxiv.org/abs/1706.03762
 
 ## Requirements
-This repository requires some libraries to run. Please ensure that you have rdkit ```bash
+This repository uses ```bash Python 3.8.11``` and requires some libraries to run. Please ensure that you have rdkit ```bash
 pip install rdkit```.\
 Pytorch 1.9 with cuda 11.1 was used, and the trainer writes to a tensorboard, and can be installed as follows:
 ```bash
