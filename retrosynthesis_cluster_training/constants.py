@@ -8,7 +8,7 @@ PAD_IDX, BOS_IDX, EOS_IDX = 0,1,2
 
 default_args= {"N_ENCODERS": [3, int],
                     "N_DECODERS": [3, int],
-                    "EMBEDDING_SIZE": [64, int],
+                    "EMBEDDING_SIZE": [512, int],
                     "N_HEADS": [8, int],
                     "DIM_FF": [512, int],
                     "DROPOUT": [1e-1, float],
