@@ -8,7 +8,7 @@ The following instructions guide you in reproducing results from [1,2] using the
 
 ## Requirements
 This repository uses ```Python 3.8.11``` and requires some libraries to run. Please ensure that you have rdkit ```pip install rdkit```.\
-Pytorch 1.9 with cuda 11.1 was used, and the trainer writes to a tensorboard, and can be installed as follows:
+PyTorch 1.9 with cuda 11.1 was used, and the trainer writes to a tensorboard, and can be installed as follows:
 ```bash
 pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
 pip install tensorboard
