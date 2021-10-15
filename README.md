@@ -13,6 +13,7 @@ PyTorch 1.9 with cuda 11.1 was used, and the trainer writes to a tensorboard, an
 pip3 install torch==1.9.1+cu111 torchvision==0.10.1+cu111 torchaudio==0.9.1 -f https://download.pytorch.org/whl/torch_stable.html
 pip install tensorboard
 ```
+```pip install tqdm``` is also required.
 
 ## Installation
 ```bash
