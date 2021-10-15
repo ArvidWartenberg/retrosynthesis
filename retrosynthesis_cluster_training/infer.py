@@ -11,7 +11,7 @@ from Inferrer import *
 def parseArguments():
         # Create argument parser
         parser = argparse.ArgumentParser()
-
+        
         parser.add_argument("--model", help="date/time model indicator", required=False)
         parser.add_argument("--algorithm", help="search algorithm", default="greedy", required=False)
         parser.add_argument("--device", help="choose device", default="0", required=False)

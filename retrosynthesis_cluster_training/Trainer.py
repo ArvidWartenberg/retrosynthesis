@@ -99,8 +99,8 @@ class Trainer:
             model_str = self.args["name"]
         os.mkdir(total_dir_path + model_str)
         os.mkdir(total_dir_path + model_str + "/logdir")
-        print("tensorboard --logdir " + total_dir_path + " --port=6006")
-        print("tensorboard --logdir " + total_dir_path + model_str + "/logdir/ --port=6006")
+        print("tensorboard --logdir " + total_dir_path + " --port="+self.args["port"])
+        print("tensorboard --logdir " + total_dir_path + model_str + "/logdir/ --port="+self.args["port"])
 
 
 

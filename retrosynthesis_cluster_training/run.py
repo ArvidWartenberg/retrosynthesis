@@ -21,6 +21,7 @@ def parseArguments(default_args):
         parser.add_argument("--checkpoint", help="Load model checkpoint", required=False)
         parser.add_argument("--name", help="Name run", required=False)
         parser.add_argument("--debug", help="Debug", required=False)
+        parser.add_argument("--port", help="Tensorboard port", default="6006", required=False)
         
         args = parser.parse_args().__dict__
         args["device"] = "cuda:" + args["device"]

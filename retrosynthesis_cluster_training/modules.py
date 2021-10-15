@@ -15,6 +15,7 @@ from heapq import heappush, heappop
 from rdkit import RDLogger 
 RDLogger.DisableLog('rdApp.*')
 from itertools import count
+import gc
 
 
 # Deep learning modules
@@ -28,5 +29,4 @@ from torch.nn import Transformer
 from torch.utils.data import Dataset
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
-import gc
 from torch.optim.lr_scheduler import CosineAnnealingLR, CosineAnnealingWarmRestarts
