@@ -34,6 +34,8 @@ class Trainer:
         # Iterate over batches in split
         losses = 0
         accuracy = 0
+        top_3_accuracy = 0
+        top_5_accuracy = 0
         with torch.set_grad_enabled(split == "train"):
             for batch in self.dataloaders[split]:
                 #torch.tensor().to(dtype=torch.int64)
@@ -69,7 +71,11 @@ class Trainer:
                     loss.backward()
                     self.optimizer.step()
                 
-
+                #pdb.set_trace()
+                top_3_accuracy += torch.sum(torch.any(((torch.flip(torch.argsort(logits,dim=-1),dims=[-1])[:,:,0:3] == tgt_out.unsqueeze(-1).tile([1,1,3]))*((tgt_out != PAD_IDX)).unsqueeze(-1).tile([1,1,3])).to(torch.int32),axis=-1))/torch.where(flat_targets != PAD_IDX)[0].shape[0]
+                
+                top_5_accuracy += torch.sum(torch.any(((torch.flip(torch.argsort(logits,dim=-1),dims=[-1])[:,:,0:5] == tgt_out.unsqueeze(-1).tile([1,1,5]))*((tgt_out != PAD_IDX)).unsqueeze(-1).tile([1,1,5])).to(torch.int32),axis=-1))/torch.where(flat_targets != PAD_IDX)[0].shape[0]
+                
                 non_pad_ixs = torch.where(flat_targets != PAD_IDX)
                 predicted_chars = torch.argmax(logits.reshape(-1, logits.shape[-1]),axis=1)
                 
@@ -80,7 +86,7 @@ class Trainer:
                 losses += loss.item()
                 
                 
-        return losses/len(self.dataloaders[split]), accuracy/len(self.dataloaders[split])
+        return losses/len(self.dataloaders[split]), accuracy/len(self.dataloaders[split]), top_3_accuracy/len(self.dataloaders[split]), top_5_accuracy/len(self.dataloaders[split])
 
     # This method manages training by iterating over epochs, saving some data to a tensorboard along the way
     def training_monitoring(self):
@@ -119,6 +125,9 @@ class Trainer:
 
         for epoch in range(self.args["EPOCHS"]):
             losses = {}
+            accuracies = {}
+            top_3_accuracies = {}
+            top_5_accuracies = {}
             print()
 
             print("Beginning of epoch %i"%(epoch), end="")
@@ -127,14 +136,14 @@ class Trainer:
                 t1 = time()
                 print("..." + split, end="")
                 
-                epoch_loss, accuracy = self.run_one_split(split=split)
+                epoch_loss, accuracy, top_3_accuracy, top_5_accuracy = self.run_one_split(split=split)
                 print("...finished in %.2f s! "%(time()-t1), end="")
                 
                 losses[split] = epoch_loss
+                accuracies[split] = accuracy
+                top_3_accuracies[split] = top_3_accuracy
+                top_5_accuracies[split] = top_5_accuracy
                 running_losses[split].append(epoch_loss)
-                                
-                writer.add_scalar('Training/'+split+"_loss", epoch_loss, epoch+1)
-                writer.add_scalar("Metrics/"+split+"_char_accuracy", accuracy, epoch+1)
                 
                 if (split == 'eval' and epoch_loss < best_loss) or (self.args["debug"] is not None and epoch_loss < best_loss):
                     best_loss = epoch_loss
@@ -150,7 +159,17 @@ class Trainer:
                     
                 if split == "train": torch.save(self.model.state_dict(), total_dir_path + model_str + "/latest")
             
-            self.scheduler.step()
-            writer.add_scalar('Training/'+"LR", self.scheduler.get_lr()[0], epoch+1)
+            writer.add_scalar("Training/train loss", losses['train'], epoch+1)
+            writer.add_scalar("Training/eval loss", losses['eval'], epoch+1)
+            writer.add_scalar("Training/_lr", self.scheduler.get_lr()[0], epoch+1)
+            #writer.add_scalar("Metrics/top-1 train", accuracies['train'], epoch+1)
+            writer.add_scalar("Metrics/top-1 eval", accuracies['eval'], epoch+1)
+            #writer.add_scalar("Metrics/top-3 train", top_3_accuracies['train'], epoch+1)
+            writer.add_scalar("Metrics/top-3 eval", top_3_accuracies['eval'], epoch+1)
+            #writer.add_scalar("Metrics/top-5 train", top_5_accuracies['train'], epoch+1)
+            writer.add_scalar("Metrics/top-5 eval", top_5_accuracies['eval'], epoch+1)
+            
             print()
             print("Epoch %i losses are; Train: %.4f // Eval: %.4f."%(epoch,losses["train"],losses["eval"]))
+            
+            self.scheduler.step()

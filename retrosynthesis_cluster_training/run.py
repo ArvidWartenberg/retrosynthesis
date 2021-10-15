@@ -22,6 +22,7 @@ def parseArguments(default_args):
         parser.add_argument("--name", help="Name run", required=False)
         parser.add_argument("--debug", help="Debug", required=False)
         parser.add_argument("--port", help="Tensorboard port", default="6006", required=False)
+        parser.add_argument("--dataset", help="Tensorboard port", default="non-aug", required=False)
         
         args = parser.parse_args().__dict__
         args["device"] = "cuda:" + args["device"]
@@ -52,8 +53,8 @@ def main():
     torch.cuda.empty_cache()
     gc.collect()
     
-    file = open(args["home_dir"] + "/data/USTPO_not_augmented/data.pickle","rb")
-    #open("/home/arvid/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
+    if args["dataset"] == "non-aug": file = open(args["home_dir"] + "/data/USTPO_not_augmented/data.pickle","rb")
+    else: file = open(args["home_dir"] + "/data/USTPO_paper_5x/USTPO_5x_parsed.pickle",'rb')
     
     data = pickle.load(file)
     if args["debug"] is not None: 
@@ -97,22 +98,22 @@ def main():
     
     optimizer = torch.optim.Adam(chemFormer.parameters(), lr=args["LR"], betas=(0.9, 0.98), eps=1e-9)
     print(args["EPOCHS"])
-    '''
-    scheduler = CosineAnnealingWarmupRestarts(optimizer=optimizer,
-                                            first_cycle_steps=args["EPOCHS"],
-                                            cycle_mult=1,
-                                            max_lr=1e-4,
-                                            min_lr=1e-5,
-                                            warmup_steps=15,
-                                            gamma=1.0,
-                                            last_epoch=-1)
     
-    '''
-    scheduler = NoamLR(optimizer=optimizer,
-                       model_size=512,
-                       warmup_steps=args["WARMUP_STEPS"],
-                       last_epoch=-1)
     
+    if args["SCHEDULER"] == "noam":
+        scheduler = NoamLR(optimizer=optimizer,
+                           model_size=512,
+                           warmup_steps=args["WARMUP_STEPS"],
+                           last_epoch=-1)
+    elif args["SCHEDULER"] == "cos":
+        scheduler = CosineAnnealingWarmupRestarts(optimizer=optimizer,
+                                                  first_cycle_steps=200,
+                                                  cycle_mult=1.0,
+                                                  max_lr=7e-4,
+                                                  min_lr=1e-5,
+                                                  warmup_steps=40,
+                                                  gamma=0.5,
+                                                  last_epoch=-1)
     #scheduler = None
     
     loss_fn = torch.nn.CrossEntropyLoss(ignore_index=PAD_IDX)
