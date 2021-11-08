@@ -6,7 +6,11 @@ from Transformer import *
 from torch.optim.lr_scheduler import _LRScheduler
 
 def tokens_to_smiles(tokens):
-    return "".join([ix_to_char[e] for e in tokens]).split(".")
+    unfiltered = "".join([ix_to_char[e] for e in tokens]).split(".")
+    filtered = []
+    for e in unfiltered:
+        if e != "": filtered.append(e)
+    return filtered
 
 def smiles_matching(tgt_smiles, out_smiles):
     out_mols = [Chem.MolFromSmiles(e) for e in out_smiles]

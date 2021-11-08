@@ -62,11 +62,19 @@ class Trainer:
                                     src_padding_mask=src_padding_mask,
                                     tgt_padding_mask=tgt_padding_mask,
                                     memory_key_padding_mask=src_padding_mask)
-
+                
+                #New: 
+                #logits, yields = self.model(...)
+                
                 # compute loss and backprop
                 flat_targets = tgt_out.reshape(-1)
                 loss = self.loss_fn(logits.reshape(-1, logits.shape[-1]), flat_targets)
-
+                
+                #New addition to the loss:
+                # yields <-- yields(seq token == end_token)
+                # loss_yield = ordinal regression loss(yields, target_yields)
+                
+                
                 if split=="train": 
                     loss.backward()
                     self.optimizer.step()

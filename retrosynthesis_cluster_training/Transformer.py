@@ -109,7 +109,7 @@ class Seq2SeqTransformer(nn.Module):
                                 memory_key_padding_mask=memory_key_padding_mask)
         
         
-        return self.generator(outs)
+        return self.generator(outs)#, self.linear_to_yield(outs)
     
     # encoder for inference
     def encode(self,

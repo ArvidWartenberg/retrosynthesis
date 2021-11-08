@@ -27,11 +27,12 @@ class ReactionDataset(Dataset):
     def __getitem__(self, index):
         rs_smiles = self.data[index]["rs"]
         ps_smiles = self.data[index]["ps"]
+        """
         if rs_smiles[0] == ".":
             rs_smiles=rs_smiles[1:]
         if ps_smiles[0] == ".":
             ps_smiles=ps_smiles[1:]
-        
+        """
         
         rs_smiles = self.ix_to_char[BOS_IDX] + rs_smiles + self.ix_to_char[EOS_IDX] + (self.maxlen-len(rs_smiles)-2)*" "
         ps_smiles = ps_smiles + (self.maxlen-len(ps_smiles))*" "

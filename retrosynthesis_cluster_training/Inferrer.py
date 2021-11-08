@@ -231,6 +231,8 @@ class Inferrer:
         for i in range(min(len(argsort), top_k)):
             ix = argsort[i]
             seq = finished_items[ix][1]["seq"]
+            if self.args["dataset"] == "aug" and seq[0] == ".":
+                seq = seq[1:]
             smiles = tokens_to_smiles(seq[1:-1])
             top_k_list.append({"p": probabilities[i].item(), "output": smiles})
 
